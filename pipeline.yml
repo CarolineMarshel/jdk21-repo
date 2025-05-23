@@ -1,0 +1,28 @@
+resources:
+- name: jdk21-repo
+  type: git
+  source:
+    uri: https://github.com/CarolineMarshel/jdk21-repo.git
+    branch: main
+
+jobs:
+- name: build-jdk21-image
+  plan:
+  - get: jdk21-repo
+    trigger: true
+  - task: build-image
+    privileged: true
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: { repository: docker }
+      inputs:
+        - name: jdk21-repo
+      run:
+        path: sh
+        args:
+          - -exc
+          - |
+            cd jdk21-repo
+            docker build -t jdk21-local .
